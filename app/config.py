@@ -37,6 +37,7 @@ class Settings(BaseSettings):
 
     admin_username: str = "admin"
     admin_password: str = ""
+    admin_password_force_reset: bool = False
 
     api_key_prefix: str = "llmmm"
 

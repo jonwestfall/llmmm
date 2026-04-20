@@ -70,6 +70,15 @@ def create_app() -> FastAPI:
                     )
                 else:
                     logger.info("Created default admin user '%s' from environment", settings.admin_username)
+            elif settings.admin_password and settings.admin_password_force_reset:
+                user.password_hash = hash_password(settings.admin_password)
+                user.is_active = True
+                db.add(user)
+                db.commit()
+                logger.warning(
+                    "Reset password for existing admin user '%s' due to LLMMM_ADMIN_PASSWORD_FORCE_RESET=true",
+                    settings.admin_username,
+                )
 
             ensure_default_pull_profile(db)
             db.commit()

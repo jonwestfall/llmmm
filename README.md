@@ -47,6 +47,7 @@ cp .env.example .env
 2. Set strong secrets in `.env`.
 
 - `LLMMM_ADMIN_PASSWORD`
+- `LLMMM_ADMIN_PASSWORD_FORCE_RESET` (`true` once if you need to reset an existing admin password, then set back to `false`)
 - `LLMMM_SESSION_SECRET`
 - `LLMMM_SECRET_KEY`
 - `LLMMM_BASE_EXTERNAL_URL` (public URL)
@@ -63,6 +64,16 @@ docker compose up -d --build
 - `http://<server>:8080/login`
 - Username: `admin`
 - Password: `LLMMM_ADMIN_PASSWORD`
+
+### Admin Login Troubleshooting
+
+If you changed `LLMMM_ADMIN_PASSWORD` after first startup and login fails, your existing DB user still has the old hash.
+
+1. Set `LLMMM_ADMIN_PASSWORD` to the new value.
+2. Set `LLMMM_ADMIN_PASSWORD_FORCE_RESET=true`.
+3. Restart with `docker compose up -d --build`.
+4. Log in with the new password.
+5. Set `LLMMM_ADMIN_PASSWORD_FORCE_RESET=false` and restart once more.
 
 ## Web UI Walkthrough
 
