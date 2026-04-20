@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}LLMMM Login{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <h1>LLMMM Admin</h1>
+  <p class="lead">Sign in to manage shared memory across your LLM workflows.</p>
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+  <form method="post" action="/login" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <label>Username
+      <input type="text" name="username" autocomplete="username" required />
+    </label>
+    <label>Password
+      <input type="password" name="password" autocomplete="current-password" required />
+    </label>
+    <button type="submit">Sign In</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Edit Memory{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Edit Memory</h1>
+  <form action="/memories/{{ memory.id }}" method="post" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Title
+      <input type="text" name="title" value="{{ memory.title }}" required>
+    </label>
+    <label>Memory Body
+      <textarea name="body" rows="8" required>{{ memory.body }}</textarea>
+    </label>
+    <div class="grid-2">
+      <label>Source Model
+        <input type="text" name="source_model" value="{{ memory.source_model or '' }}">
+      </label>
+      <label>Tags
+        <input type="text" name="tags" value="{{ memory.tags | join(', ') }}">
+      </label>
+    </div>
+    <div class="grid-3">
+      <label>Importance
+        <input type="number" name="importance" min="1" max="5" value="{{ memory.importance }}">
+      </label>
+      <label class="checkbox-wrap">Pinned
+        <input type="checkbox" name="pinned" value="true" {% if memory.pinned %}checked{% endif %}>
+      </label>
+    </div>
+    <label>Metadata JSON
+      <textarea name="metadata_json" rows="8">{{ metadata_json }}</textarea>
+    </label>
+    <div class="card-actions">
+      <button type="submit">Save Changes</button>
+      <a href="/" class="ghost">Back</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

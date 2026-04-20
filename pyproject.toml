@@ -1,0 +1,9 @@
+[project]
+name = "llmmm"
+version = "0.1.0"
+description = "Large Language Model Memory Manager"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

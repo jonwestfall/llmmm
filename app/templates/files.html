@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Files{% endblock %}
+{% block content %}
+<section class="split">
+  <div class="panel">
+    <h1>Reference Files</h1>
+    <p class="lead">Upload context files (PDF, DOCX, TXT, MD) and generate controlled share links for LLMs.</p>
+    {% if share_link %}
+    <div class="secret-box">
+      <p>New share link:</p>
+      <code>{{ share_link }}</code>
+    </div>
+    {% endif %}
+    <form action="/files/upload" method="post" enctype="multipart/form-data" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>File
+        <input type="file" name="file" required>
+      </label>
+      <label>Description
+        <input type="text" name="description" placeholder="Style guide v2">
+      </label>
+      <button type="submit">Upload File</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Uploaded Files</h2>
+    {% for f in files %}
+    <article class="memory-card">
+      <header>
+        <h3>{{ f.original_name }}</h3>
+        <span class="pill">{{ (f.size_bytes / 1024) | round(1) }} KB</span>
+      </header>
+      <p class="tiny">{{ f.mime_type }}{% if f.description %} • {{ f.description }}{% endif %}</p>
+      <details>
+        <summary>Create Share Link</summary>
+        <form action="/files/{{ f.id }}/share" method="post" class="stack compact">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label>Expires In (hours)
+            <input type="number" name="expires_in_hours" min="1" placeholder="168">
+          </label>
+          <label>Max Downloads
+            <input type="number" name="max_downloads" min="1" placeholder="optional">
+          </label>
+          <label>Password (optional)
+            <input type="text" name="password" placeholder="leave blank for none">
+          </label>
+          <label>Note
+            <input type="text" name="note" placeholder="Claude project docs">
+          </label>
+          <button type="submit">Create Link</button>
+        </form>
+      </details>
+
+      {% if f.shares %}
+      <div class="shares">
+        <p class="tiny">Existing links</p>
+        {% for share in f.shares %}
+        <div class="share-row">
+          <span class="tiny">{{ share.created_at }} • downloads {{ share.download_count }}{% if share.expires_at %} • expires {{ share.expires_at }}{% endif %}{% if not share.is_active %} • disabled{% endif %}</span>
+          {% if share.is_active %}
+          <form action="/files/{{ f.id }}/shares/{{ share.id }}/disable" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="ghost danger" type="submit">Disable</button>
+          </form>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+    {% if not files %}
+    <p class="tiny">No files uploaded yet.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

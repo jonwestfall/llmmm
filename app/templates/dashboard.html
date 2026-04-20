@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}LLMMM Memories{% endblock %}
+{% block content %}
+<section class="split">
+  <div class="panel">
+    <h1>Memory Inbox</h1>
+    <p class="lead">Store notes, preferences, and context for ChatGPT, Codex, Gemini, Claude, and NotebookLM.</p>
+    <form action="/memories" method="post" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Title
+        <input type="text" name="title" placeholder="What should future LLM sessions remember?" required>
+      </label>
+      <label>Memory Body
+        <textarea name="body" rows="7" placeholder="Write the core memory, examples, and instructions." required></textarea>
+      </label>
+      <div class="grid-2">
+        <label>Source Model
+          <input type="text" name="source_model" value="{{ source_model }}" placeholder="chatgpt, codex, gemini...">
+        </label>
+        <label>Tags (comma separated)
+          <input type="text" name="tags" placeholder="style, writing, customer-a">
+        </label>
+      </div>
+      <div class="grid-3">
+        <label>Importance (1-5)
+          <input type="number" name="importance" min="1" max="5" value="3">
+        </label>
+        <label class="checkbox-wrap">Pin memory
+          <input type="checkbox" name="pinned" value="true">
+        </label>
+      </div>
+      <label>Metadata JSON
+        <textarea name="metadata_json" rows="5" placeholder='{"project":"alpha","expires":"2027-01-01"}'>{}</textarea>
+      </label>
+      <button type="submit">Save Memory</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Search & Edit</h2>
+    <form class="inline-form" method="get" action="/">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search title/body">
+      <input type="text" name="tag" value="{{ tag }}" placeholder="tag">
+      <input type="text" name="source_model" value="{{ source_model }}" placeholder="source">
+      <button type="submit" class="ghost">Filter</button>
+      <a href="/" class="ghost">Reset</a>
+    </form>
+
+    <p class="tiny">{{ total }} memories</p>
+
+    <div class="memory-list">
+      {% for m in memories %}
+      <article class="memory-card {% if m.pinned %}pinned{% endif %}">
+        <header>
+          <h3>{{ m.title }}</h3>
+          <span class="pill">{{ m.source_model or 'unspecified' }}</span>
+        </header>
+        <p class="body-preview">{{ m.body }}</p>
+        <p class="tiny mono">tags: {{ m.tags | join(', ') if m.tags else 'none' }}</p>
+        <div class="card-actions">
+          <a href="/memories/{{ m.id }}" class="ghost">Edit</a>
+          <form action="/memories/{{ m.id }}/delete" method="post" onsubmit="return confirm('Delete this memory?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="ghost danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </article>
+      {% endfor %}
+      {% if not memories %}
+      <p class="tiny">No memories yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

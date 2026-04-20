@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}API Keys{% endblock %}
+{% block content %}
+<section class="split">
+  <div class="panel">
+    <h1>Create API Key</h1>
+    <p class="lead">Create dedicated keys per LLM tool so you can revoke access independently.</p>
+    {% if new_key %}
+    <div class="secret-box">
+      <p>Copy this key now:</p>
+      <code>{{ new_key }}</code>
+    </div>
+    {% endif %}
+    <form action="/keys" method="post" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Name
+        <input type="text" name="name" placeholder="Codex Production Key" required>
+      </label>
+      <label>Source Hint
+        <input type="text" name="source_hint" placeholder="codex, chatgpt, claude">
+      </label>
+      <label>Scopes (comma separated)
+        <input type="text" name="scopes" value="read,write,files">
+      </label>
+      <button type="submit">Create Key</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Existing Keys</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Scopes</th>
+          <th>Status</th>
+          <th>Last Used</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for key in keys %}
+        <tr>
+          <td>{{ key.name }}</td>
+          <td class="mono">{{ key.scopes | join(',') }}</td>
+          <td>{{ 'active' if key.is_active else 'revoked' }}</td>
+          <td>{{ key.last_used_at or 'never' }}</td>
+          <td>
+            {% if key.is_active %}
+            <form action="/keys/{{ key.id }}/revoke" method="post" onsubmit="return confirm('Revoke this key?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="ghost danger" type="submit">Revoke</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
