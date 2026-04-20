@@ -50,6 +50,7 @@ cp .env.example .env
 - `LLMMM_SESSION_SECRET`
 - `LLMMM_SECRET_KEY`
 - `LLMMM_BASE_EXTERNAL_URL` (public URL)
+- `LLMMM_SESSION_HTTPS_ONLY` (`true` for HTTPS deployments, `false` for local HTTP testing)
 
 3. Build and run.
 

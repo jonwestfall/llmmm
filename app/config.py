@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Optional
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -14,6 +15,7 @@ class Settings(BaseSettings):
 
     secret_key: str = "change-me-in-production"
     session_secret: str = "change-me-too"
+    session_https_only: Optional[bool] = None
 
     database_url: str = "sqlite:///./data/llmmm.db"
 
@@ -58,6 +60,12 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def session_cookie_secure(self) -> bool:
+        if self.session_https_only is not None:
+            return self.session_https_only
+        return self.base_external_url.strip().lower().startswith("https://")
 
     def ensure_dirs(self) -> None:
         for p in [self.data_dir, self.files_dir, self.backup_dir]:
