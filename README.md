@@ -139,6 +139,7 @@ curl -sS "$LLMMM_URL/api/v1/files/<file_id>/share-links" \
 ## LLM Integration Patterns
 
 Detailed guide: [`docs/integrations.md`](docs/integrations.md)
+Getting-started memory prompting guide: [`docs/getting-started.md`](docs/getting-started.md)
 
 High-level pattern:
 
