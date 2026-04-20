@@ -160,6 +160,82 @@ Examples:
 ./scripts/llmmm_pull.sh "$LLMMM_URL" "$LLMMM_API_KEY" default
 ```
 
+## Testing from Command LIne
+
+Set these once in your shell:
+
+```bash
+export LLMMM_URL="http://localhost:8080"
+export LLMMM_API_KEY="<your-read-or-read/write-key>"
+```
+
+Basic health check:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/health" | jq .
+```
+
+List latest memories:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/memories?limit=10" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq .
+```
+
+Query memories by keyword:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/memories?q=style&limit=20" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq '.items[] | {id,title,source_model,tags}'
+```
+
+Filter memories by tag:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/memories?tags=client-a&limit=20" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq '.items[] | {id,title,tags,importance,pinned}'
+```
+
+Fetch one specific memory by ID:
+
+```bash
+MEMORY_ID="<memory-id>"
+curl -sS "$LLMMM_URL/api/v1/memories/$MEMORY_ID" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq .
+```
+
+Pull context profile (what LLMs should periodically read):
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/context/pull?profile=default" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq '.profile, .items[] | {id,title,source_model,tags}'
+```
+
+Check available files:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/files" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq '.[] | {id,original_name,mime_type,size_bytes,uploaded_at}'
+```
+
+Inspect share links for a file:
+
+```bash
+FILE_ID="<file-id>"
+curl -sS "$LLMMM_URL/api/v1/files/$FILE_ID/share-links" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq .
+```
+
+Export memories to local files:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/memories/export?fmt=jsonl" \
+  -H "X-API-Key: $LLMMM_API_KEY" > memories.jsonl
+
+curl -sS "$LLMMM_URL/api/v1/memories/export?fmt=csv" \
+  -H "X-API-Key: $LLMMM_API_KEY" > memories.csv
+```
+
 ## Backup and Restore
 
 - Backup:

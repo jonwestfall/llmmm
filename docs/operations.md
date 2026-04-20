@@ -48,6 +48,68 @@ Recommended pre-import shape:
 - `GET /api/v1/memories/export?fmt=jsonl`
 - `GET /api/v1/memories/export?fmt=csv`
 
+## Testing from Command LIne
+
+Set environment variables:
+
+```bash
+export LLMMM_URL="http://localhost:8080"
+export LLMMM_API_KEY="<your-api-key>"
+```
+
+Check service health:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/health" | jq .
+```
+
+List recent memories:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/memories?limit=10" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq .
+```
+
+Query memories by text/tag:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/memories?q=style&tags=writing&limit=20" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq '.items[] | {id,title,tags,source_model}'
+```
+
+Read a specific memory:
+
+```bash
+MEMORY_ID="<memory-id>"
+curl -sS "$LLMMM_URL/api/v1/memories/$MEMORY_ID" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq .
+```
+
+Pull context profile:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/context/pull?profile=default" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq '.profile, .items[] | {id,title,tags}'
+```
+
+List files and inspect share links:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/files" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq '.[] | {id,original_name,mime_type,size_bytes}'
+
+FILE_ID="<file-id>"
+curl -sS "$LLMMM_URL/api/v1/files/$FILE_ID/share-links" \
+  -H "X-API-Key: $LLMMM_API_KEY" | jq .
+```
+
+Export memories:
+
+```bash
+curl -sS "$LLMMM_URL/api/v1/memories/export?fmt=jsonl" \
+  -H "X-API-Key: $LLMMM_API_KEY" > memories.jsonl
+```
+
 ## File Reference Lifecycle
 
 1. Upload file at `/files` or `/api/v1/files/upload`.
